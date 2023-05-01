@@ -7,9 +7,11 @@ import (
 
 func (block *Block) Print() {
 	fmt.Printf("timestamp       %d\n", block.timeStamp)
-	fmt.Printf("none            %d\n", block.nonce)
-	fmt.Printf("previous_hash   %s\n", block.previousHash)
-	fmt.Printf("transaction     %s\n", block.transaction)
+	fmt.Printf("nonce           %d\n", block.nonce)
+	fmt.Printf("previous_hash   %x\n", block.previousHash)
+	for _, trans := range block.transaction {
+		trans.Print()
+	}
 }
 
 func (blockChain *BlockChain) Print() {
