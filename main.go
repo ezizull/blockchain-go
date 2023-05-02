@@ -13,12 +13,14 @@ func main() {
 
 	blockChain.AddTranscation("A", "B", 1.0)
 	prevHash := blockChain.LastBlock().Hash()
-	blockChain.CreateBlock(5, prevHash)
+	nonce := blockChain.ProofOfWork()
+	blockChain.CreateBlock(nonce, prevHash)
 	blockChain.Print()
 
 	blockChain.AddTranscation("C", "D", 2.0)
 	blockChain.AddTranscation("X", "Y", 3.0)
 	prevHash = blockChain.LastBlock().Hash()
-	blockChain.CreateBlock(4, prevHash)
+	nonce = blockChain.ProofOfWork()
+	blockChain.CreateBlock(nonce, prevHash)
 	blockChain.Print()
 }
