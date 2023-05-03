@@ -2,25 +2,28 @@ package main
 
 import (
 	"blockchain-go/domain/block"
+	"fmt"
 	"log"
 )
 
 func main() {
 	log.SetPrefix("Blockchain: ")
 
-	blockChain := block.NewBlockChain()
+	myBlockChainAddress := "my_blockchain_address"
+
+	blockChain := block.NewBlockChain(myBlockChainAddress)
 	blockChain.Print()
 
 	blockChain.AddTranscation("A", "B", 1.0)
-	prevHash := blockChain.LastBlock().Hash()
-	nonce := blockChain.ProofOfWork()
-	blockChain.CreateBlock(nonce, prevHash)
+	blockChain.Maining()
 	blockChain.Print()
 
 	blockChain.AddTranscation("C", "D", 2.0)
 	blockChain.AddTranscation("X", "Y", 3.0)
-	prevHash = blockChain.LastBlock().Hash()
-	nonce = blockChain.ProofOfWork()
-	blockChain.CreateBlock(nonce, prevHash)
+	blockChain.Maining()
 	blockChain.Print()
+
+	fmt.Printf("my %.1f\n", blockChain.CalculateTotalAmount("my_blockchain_address"))
+	fmt.Printf("C  %.1f\n", blockChain.CalculateTotalAmount("C"))
+	fmt.Printf("D  %.1f\n", blockChain.CalculateTotalAmount("D"))
 }

@@ -2,6 +2,7 @@ package block
 
 import (
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -49,9 +50,36 @@ func (blockChain *BlockChain) ProofOfWork() int {
 	return nonce
 }
 
-func NewBlockChain() *BlockChain {
+func (blockChain *BlockChain) Maining() bool {
+	blockChain.AddTranscation(MINING_SENDER, blockChain.address, MINING_REWARD)
+	nonce := blockChain.ProofOfWork()
+	prevHash := blockChain.LastBlock().Hash()
+	blockChain.CreateBlock(nonce, prevHash)
+	log.Printf("action=mining, status=success\n\n")
+	return true
+}
+
+func (blockChain *BlockChain) CalculateTotalAmount(blockChainAddress string) float32 {
+	var totalAmount float32 = 0.0
+	for _, block := range blockChain.chain {
+		for _, trans := range block.transaction {
+			value := trans.value
+			if blockChainAddress == trans.recipentBlockChainAddress {
+				totalAmount += value
+			}
+
+			if blockChainAddress == trans.senderBlockChainAddress {
+				totalAmount -= value
+			}
+		}
+	}
+	return totalAmount
+}
+
+func NewBlockChain(blockChainAddress string) *BlockChain {
 	block := &Block{}
 	blockChain := new(BlockChain)
+	blockChain.address = blockChainAddress
 	blockChain.CreateBlock(0, block.Hash())
 	return blockChain
 }
