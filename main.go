@@ -1,61 +1,48 @@
 package main
 
 import (
-	"blockchain-go/domain/block"
-	"blockchain-go/domain/wallet"
+	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
+	"strings"
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/valyala/fasthttp"
 )
 
 func main() {
-	// log.SetPrefix("Blockchain: ")
+	// initialize config
+	router := fiber.New(fiber.Config{
+		JSONEncoder: json.Marshal,
+		JSONDecoder: json.Unmarshal,
+	})
+	router.Use(logger.New())
+	router.Use(limiter.New())
+	router.Use(cors.New(cors.ConfigDefault))
 
-	// myBlockChainAddress := "my_blockchain_address"
+	// running config
+	startServer(router)
+}
 
-	// blockChain := block.NewBlockChain(myBlockChainAddress)
-	// blockChain.Print()
+// start server config
+func startServer(app *fiber.App) {
+	flagPort := flag.Uint("port", 5000, "custom port number service")
+	flag.Parse()
 
-	// blockChain.AddTranscation("A", "B", 1.0)
-	// blockChain.Mining()
-	// blockChain.Print()
+	serverPort := fmt.Sprintf(":%d", *flagPort)
+	s := &fasthttp.Server{
+		Handler:            app.Handler(),
+		ReadTimeout:        18000 * time.Second,
+		WriteTimeout:       18000 * time.Second,
+		MaxRequestBodySize: 3 << 20,
+	}
 
-	// blockChain.AddTranscation("C", "D", 2.0)
-	// blockChain.AddTranscation("X", "Y", 3.0)
-	// blockChain.Mining()
-	// blockChain.Print()
-
-	// fmt.Printf("my %.1f\n", blockChain.CalculateTotalAmount("my_blockchain_address"))
-	// fmt.Printf("C  %.1f\n", blockChain.CalculateTotalAmount("C"))
-	// fmt.Printf("D  %.1f\n", blockChain.CalculateTotalAmount("D"))
-
-	// log.SetPrefix("Wallet: ")
-
-	// wallt := wallet.NewWallet()
-	// fmt.Println(wallt.PrivateKeyString())
-	// fmt.Println(wallt.PublicKeyString())
-	// fmt.Println(wallt.BlockChainAddress())
-
-	// trans := wallet.NewTransaction(wallt.PrivateKey(), wallt.PublicKey(), wallt.BlockChainAddress(), "B", 1.0)
-	// fmt.Printf("signature %s\n", trans.GenerateSignature())
-
-	log.SetPrefix("Wallet Miner: ")
-
-	walletMiner := wallet.NewWallet()
-	walletA := wallet.NewWallet()
-	walletB := wallet.NewWallet()
-
-	// wallet
-	trans := wallet.NewTransaction(walletA.PrivateKey(), walletA.PublicKey(), walletA.BlockChainAddress(), walletB.BlockChainAddress(), 1.0)
-
-	// blockchain
-	blockChain := block.NewBlockChain(walletMiner.BlockChainAddress())
-	isAdded := blockChain.AddTranscation(walletA.BlockChainAddress(), walletB.BlockChainAddress(), 1.0, walletA.PublicKey(), trans.GenerateSignature())
-	fmt.Println("Added ", isAdded)
-
-	blockChain.Mining()
-	blockChain.Print()
-
-	fmt.Printf("A %.1f\n", blockChain.CalculateTotalAmount(walletA.BlockChainAddress()))
-	fmt.Printf("B %.1f\n", blockChain.CalculateTotalAmount(walletB.BlockChainAddress()))
-	fmt.Printf("Miner %.1f\n", blockChain.CalculateTotalAmount(walletMiner.BlockChainAddress()))
+	if err := s.ListenAndServe(serverPort); err != nil {
+		log.Fatalf("fatal error description: %s", strings.ToLower(err.Error()))
+	}
 }

@@ -32,6 +32,11 @@ func (blockChain *BlockChain) AddTranscation(sender string, recipient string, va
 	}
 
 	if blockChain.VerifyTransactionSignature(senderPublicKey, sign, transaction) {
+		// if blockChain.CalculateTotalAmount(sender) < value {
+		// 	log.Println("ERROR: No enough balance in a wallet")
+		// 	return false
+		// }
+
 		blockChain.transactionPool = append(blockChain.transactionPool, transaction)
 		return true
 	} else {
