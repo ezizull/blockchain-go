@@ -1,9 +1,14 @@
 package block
 
 import (
+	"crypto/ecdsa"
+	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
+
+	signDomain "blockchain-go/domain/signature"
 )
 
 func (blockChain *BlockChain) CreateBlock(nonce int, prevHash [32]byte) *Block {
@@ -17,9 +22,29 @@ func (blockChain *BlockChain) LastBlock() *Block {
 	return blockChain.chain[len(blockChain.chain)-1]
 }
 
-func (blockChain *BlockChain) AddTranscation(sender string, recipient string, value float32) {
+func (blockChain *BlockChain) AddTranscation(sender string, recipient string, value float32,
+	senderPublicKey *ecdsa.PublicKey, sign *signDomain.Signature) bool {
 	transaction := NewTransaction(sender, recipient, value)
-	blockChain.transactionPool = append(blockChain.transactionPool, transaction)
+
+	if sender == MINING_SENDER {
+		blockChain.transactionPool = append(blockChain.transactionPool, transaction)
+		return true
+	}
+
+	if blockChain.VerifyTransactionSignature(senderPublicKey, sign, transaction) {
+		blockChain.transactionPool = append(blockChain.transactionPool, transaction)
+		return true
+	} else {
+		log.Println("ERROR: Verify Transaction")
+		return false
+	}
+}
+
+func (blockChain *BlockChain) VerifyTransactionSignature(senderPublicKey *ecdsa.PublicKey, sign *signDomain.Signature,
+	trans *Transaction) bool {
+	marshal, _ := json.Marshal(trans)
+	hash := sha256.Sum256([]byte(marshal))
+	return ecdsa.Verify(senderPublicKey, hash[:], sign.R, sign.S)
 }
 
 func (blockChain *BlockChain) CopyTransactionPool() []*Transaction {
@@ -27,7 +52,7 @@ func (blockChain *BlockChain) CopyTransactionPool() []*Transaction {
 	for _, trans := range blockChain.transactionPool {
 		transctions = append(transctions,
 			NewTransaction(trans.senderBlockChainAddress,
-				trans.recipentBlockChainAddress,
+				trans.recipientBlockChainAddress,
 				trans.value))
 	}
 	return transctions
@@ -50,8 +75,8 @@ func (blockChain *BlockChain) ProofOfWork() int {
 	return nonce
 }
 
-func (blockChain *BlockChain) Maining() bool {
-	blockChain.AddTranscation(MINING_SENDER, blockChain.address, MINING_REWARD)
+func (blockChain *BlockChain) Mining() bool {
+	blockChain.AddTranscation(MINING_SENDER, blockChain.address, MINING_REWARD, nil, nil)
 	nonce := blockChain.ProofOfWork()
 	prevHash := blockChain.LastBlock().Hash()
 	blockChain.CreateBlock(nonce, prevHash)
@@ -64,7 +89,7 @@ func (blockChain *BlockChain) CalculateTotalAmount(blockChainAddress string) flo
 	for _, block := range blockChain.chain {
 		for _, trans := range block.transaction {
 			value := trans.value
-			if blockChainAddress == trans.recipentBlockChainAddress {
+			if blockChainAddress == trans.recipientBlockChainAddress {
 				totalAmount += value
 			}
 

@@ -16,7 +16,7 @@ func NewWallet() *Wallet {
 	wallet := new(Wallet)
 	privateKey, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	wallet.privateKey = privateKey
-	wallet.publicKey = &privateKey.PublicKey
+	wallet.publicKey = &wallet.privateKey.PublicKey
 
 	// 2. Perform SHA-256 hashing on the public key (32 bytes)
 	hash2 := sha256.New()
@@ -72,7 +72,7 @@ func (wallet *Wallet) PublicKey() *ecdsa.PublicKey {
 }
 
 func (wallet *Wallet) PublicKeyString() string {
-	return fmt.Sprintf("%x%x", wallet.publicKey.X.Bytes(), wallet.privateKey.X.Bytes())
+	return fmt.Sprintf("%x%x", wallet.publicKey.X.Bytes(), wallet.privateKey.Y.Bytes())
 }
 
 func (wallet *Wallet) BlockChainAddress() string {
