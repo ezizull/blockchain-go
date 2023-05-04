@@ -52,4 +52,10 @@ func main() {
 	isAdded := blockChain.AddTranscation(walletA.BlockChainAddress(), walletB.BlockChainAddress(), 1.0, walletA.PublicKey(), trans.GenerateSignature())
 	fmt.Println("Added ", isAdded)
 
+	blockChain.Mining()
+	blockChain.Print()
+
+	fmt.Printf("A %.1f\n", blockChain.CalculateTotalAmount(walletA.BlockChainAddress()))
+	fmt.Printf("B %.1f\n", blockChain.CalculateTotalAmount(walletB.BlockChainAddress()))
+	fmt.Printf("Miner %.1f\n", blockChain.CalculateTotalAmount(walletMiner.BlockChainAddress()))
 }
