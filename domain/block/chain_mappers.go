@@ -77,7 +77,7 @@ func (blockChain *BlockChain) CalculateTotalAmount(blockChainAddress string) flo
 }
 
 func NewBlockChain(blockChainAddress string) *BlockChain {
-	block := &Block{}
+	block := new(Block)
 	blockChain := new(BlockChain)
 	blockChain.address = blockChainAddress
 	blockChain.CreateBlock(0, block.Hash())
