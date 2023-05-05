@@ -28,8 +28,7 @@ type Controller struct {
 // @Security ApiKeyAuth
 // @Accept  json
 // @Produce  json
-// @Param data body GetAllBlockByPort true "body data"
-// @Success 200 {object} blockDomain.Blockchain
+// @Success 200 {object} blockDomain.BlockChain
 // @Failure 400 {object} controllers.MessageResponse
 // @Failure 500 {object} controllers.MessageResponse
 // @Router /blockchain [post]
