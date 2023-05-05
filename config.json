@@ -1,0 +1,30 @@
+{
+  "Environment": "development",
+  "ServerPort": 5000,
+  "Secure": {
+    "JWTAccessSecure": "accesskeyyoumayneedtochangeit",
+    "JWTRefreshSecure": "refreshkeyyoumayneedtochangeit",
+    "JWTAccessTimeMinute": 10,
+    "JWTRefreshTimeHour": 10
+  },
+  "Databases": {
+    "Redis": {
+      "Localhost": {
+        "Read": {
+          "Hostname": "localhost",
+          "Username": "",
+          "Password": "",
+          "Port": "6379",
+          "Database": "1"
+        },
+        "Write": {
+          "Hostname": "localhost",
+          "Username": "",
+          "Password": "",
+          "Port": "6379",
+          "Database": "0"
+        }
+      }
+    }
+  }
+}

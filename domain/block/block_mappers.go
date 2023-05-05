@@ -3,6 +3,7 @@ package block
 import (
 	"crypto/sha256"
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -24,12 +25,12 @@ func (block *Block) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Timestamp    int64          `json:"timestamp"`
 		Nonce        int            `json:"nonce"`
-		PreviousHash [32]byte       `json:"previous_hash"`
+		PreviousHash string         `json:"previous_hash"`
 		Transaction  []*Transaction `json:"transaction"`
 	}{
 		Timestamp:    block.timeStamp,
 		Nonce:        block.nonce,
-		PreviousHash: block.previousHash,
+		PreviousHash: fmt.Sprintf("%x", block.previousHash),
 		Transaction:  block.transaction,
 	})
 }

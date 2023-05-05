@@ -60,4 +60,7 @@ const (
 
 	// StatusServiceUnavailable indicates a service unavailable error
 	StatusServiceUnavailable = "service unavailable"
+
+	// StatusInvalidPort indicates a service using invalid port
+	StatusInvalidPort = "invalid service port"
 )

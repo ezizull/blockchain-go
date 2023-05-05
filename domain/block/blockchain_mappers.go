@@ -11,6 +11,14 @@ import (
 	signDomain "blockchain-go/domain/signature"
 )
 
+func (blockChain *BlockChain) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Blocks []*Block `json:"chains"`
+	}{
+		Blocks: blockChain.chain,
+	})
+}
+
 func (blockChain *BlockChain) CreateBlock(nonce int, prevHash [32]byte) *Block {
 	block := newBlock(nonce, prevHash, blockChain.transactionPool)
 	blockChain.chain = append(blockChain.chain, block)
@@ -106,10 +114,11 @@ func (blockChain *BlockChain) CalculateTotalAmount(blockChainAddress string) flo
 	return totalAmount
 }
 
-func NewBlockChain(blockChainAddress string) *BlockChain {
+func NewBlockChain(blockChainAddress string, port uint64) *BlockChain {
 	block := new(Block)
 	blockChain := new(BlockChain)
 	blockChain.address = blockChainAddress
 	blockChain.CreateBlock(0, block.Hash())
+	blockChain.port = port
 	return blockChain
 }
