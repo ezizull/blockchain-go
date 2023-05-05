@@ -4,6 +4,7 @@ import (
 	blockDomain "blockchain-go/domain/block"
 	redisRepo "blockchain-go/infrastructure/repository/redis"
 	"encoding/json"
+	"net"
 	"strconv"
 	"time"
 
@@ -35,11 +36,16 @@ type Controller struct {
 func (c *Controller) GetAllBlockByPort(ctx *fiber.Ctx) error {
 	var blockChain *blockDomain.BlockchainResponse
 
+	_, ctxPort, err := net.SplitHostPort(ctx.Context().LocalAddr().String())
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": mssgConst.StatusInvalidPort})
+	}
+
 	redisDB := c.InfoRedis.NewRedis(1)
-	redisData, redisErr := redisDB.Get(c.InfoRedis.CTX, ctx.Port()).Result()
+	redisData, redisErr := redisDB.Get(c.InfoRedis.CTX, ctxPort).Result()
 
 	if redisErr == redis.Nil {
-		port, err := strconv.ParseUint(ctx.Port(), 10, 64)
+		port, err := strconv.ParseUint(ctxPort, 10, 64)
 		if err != nil {
 			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": mssgConst.StatusInvalidPort})
 		}
@@ -56,7 +62,7 @@ func (c *Controller) GetAllBlockByPort(ctx *fiber.Ctx) error {
 			})
 		}
 
-		status := redisDB.Set(c.InfoRedis.CTX, ctx.Port(), blockChainJSON, 30*60*time.Second)
+		status := redisDB.Set(c.InfoRedis.CTX, ctxPort, blockChainJSON, 30*60*time.Second)
 		if status.Err() != nil {
 			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "failed set redis"})
 		}
