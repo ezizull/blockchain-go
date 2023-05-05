@@ -7,6 +7,17 @@ import (
 	"log"
 )
 
+// Service is a struct that contains the repository implementation for block use case
+type Service struct {
+}
+
+// GetAll is a function that returns all blocks
+func (s *Service) GetAll(page int, limit int) (*blockDomain.BlockChain, error) {
+	return &blockDomain.BlockChain{
+		//
+	}, nil
+}
+
 func blockChain() {
 	log.SetPrefix("Blockchain: ")
 

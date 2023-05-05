@@ -8,6 +8,10 @@ import (
 	"strings"
 	"time"
 
+	databsDomain "blockchain-go/domain/database"
+	"blockchain-go/infrastructure/repository/redis"
+	"blockchain-go/infrastructure/restapi/routes"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
@@ -25,8 +29,27 @@ func main() {
 	router.Use(limiter.New())
 	router.Use(cors.New(cors.ConfigDefault))
 
+	// init databases
+	databases := initDatabase()
+
+	// databases routes
+	routes.ApplicationV1Router(router, databases)
+
 	// running config
 	startServer(router)
+}
+
+// initial databases
+func initDatabase() databsDomain.Database {
+	// redis connection
+	redisDB, err := redis.InitRedis()
+	if err != nil {
+		panic(fmt.Errorf("fatal error in redis: %s", err))
+	}
+
+	return databsDomain.Database{
+		Redis: redisDB,
+	}
 }
 
 // start server config
