@@ -9,9 +9,9 @@ import (
 type Service struct {
 }
 
-// GetByPort is a function that returns blockchain by port
-func (s *Service) GetByPort(port uint64) (*blockDomain.BlockChain, error) {
+// GetAllChainByPort is a function that returns blockchain by port
+func (s *Service) GetAllChainByPort(port uint64) (*blockDomain.BlockchainResponse, error) {
 	walletMiner := walletDomain.NewWallet()
 	blockChain := blockDomain.NewBlockChain(walletMiner.BlockChainAddress(), port)
-	return blockChain, nil
+	return blockChain.ToBlockChainResponse(), nil
 }

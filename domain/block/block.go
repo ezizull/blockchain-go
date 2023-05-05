@@ -12,3 +12,10 @@ type Block struct {
 	previousHash [32]byte
 	transaction  []*Transaction
 }
+
+type BlockResponse struct {
+	TimeStamp    int64          `json:"timestamp"`
+	Nonce        int            `json:"nonce"`
+	PreviousHash string       `json:"previous_hash"`
+	Transaction  []*Transaction `json:"transaction"`
+}

@@ -6,3 +6,7 @@ type BlockChain struct {
 	address         string
 	port            uint64
 }
+
+type BlockchainResponse struct {
+	Chain []*BlockResponse `json:"chain"`
+}

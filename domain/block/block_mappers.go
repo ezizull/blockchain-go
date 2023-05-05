@@ -1,36 +1,32 @@
 package block
 
 import (
-	"crypto/sha256"
-	"encoding/json"
+	"encoding/hex"
 	"fmt"
-	"time"
 )
 
-func newBlock(nonce int, prevHash [32]byte, transactions []*Transaction) *Block {
-	block := new(Block)
-	block.timeStamp = time.Now().UnixNano()
-	block.nonce = nonce
-	block.previousHash = prevHash
-	block.transaction = transactions
-	return block
+// ToBlockResponseArray
+func ToBlockResponseArray(blocks []*Block) []*BlockResponse {
+	responses := make([]*BlockResponse, len(blocks))
+	for i, block := range blocks {
+		previousHashStr := hex.EncodeToString(block.previousHash[:])
+		response := &BlockResponse{
+			TimeStamp:    block.timeStamp,
+			Nonce:        block.nonce,
+			PreviousHash: previousHashStr,
+			Transaction:  block.transaction,
+		}
+		responses[i] = response
+	}
+	return responses
 }
 
-func (block *Block) Hash() [32]byte {
-	marshal, _ := json.Marshal(block)
-	return sha256.Sum256([]byte(marshal))
-}
-
-func (block *Block) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		Timestamp    int64          `json:"timestamp"`
-		Nonce        int            `json:"nonce"`
-		PreviousHash string         `json:"previous_hash"`
-		Transaction  []*Transaction `json:"transaction"`
-	}{
-		Timestamp:    block.timeStamp,
-		Nonce:        block.nonce,
-		PreviousHash: fmt.Sprintf("%x", block.previousHash),
-		Transaction:  block.transaction,
-	})
+// Print
+func (block *Block) Print() {
+	fmt.Printf("timestamp       %d\n", block.timeStamp)
+	fmt.Printf("nonce           %d\n", block.nonce)
+	fmt.Printf("previous_hash   %x\n", block.previousHash)
+	for _, trans := range block.transaction {
+		trans.Print()
+	}
 }

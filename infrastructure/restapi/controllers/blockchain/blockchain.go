@@ -20,39 +20,40 @@ type Controller struct {
 	BlockChain useCaseBlockChain.Service
 }
 
-// GetBlockChainByPort godoc
+// GetAllBlockByPort godoc
 // @Tags blockchain
 // @Summary Get Blockchain By Port Service
 // @Description Create new blockchain on the system
 // @Security ApiKeyAuth
 // @Accept  json
 // @Produce  json
-// @Param data body GetBlockChainByPort true "body data"
+// @Param data body GetAllBlockByPort true "body data"
 // @Success 200 {object} blockDomain.Blockchain
 // @Failure 400 {object} controllers.MessageResponse
 // @Failure 500 {object} controllers.MessageResponse
 // @Router /blockchain [post]
-func (c *Controller) GetBlockChainByPort(ctx *fiber.Ctx) error {
-	var blockChain *blockDomain.BlockChain
+func (c *Controller) GetAllBlockByPort(ctx *fiber.Ctx) error {
+	var blockChain *blockDomain.BlockchainResponse
 
 	redisDB := c.InfoRedis.NewRedis(1)
 	redisData, redisErr := redisDB.Get(c.InfoRedis.CTX, ctx.Port()).Result()
 
 	if redisErr == redis.Nil {
-
 		port, err := strconv.ParseUint(ctx.Port(), 10, 64)
 		if err != nil {
 			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": mssgConst.StatusInvalidPort})
 		}
 
-		blockChain, err = c.BlockChain.GetByPort(port)
+		blockChain, err = c.BlockChain.GetAllChainByPort(port)
 		if err != nil {
 			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err})
 		}
 
-		blockChainJSON, err := blockChain.MarshalJSON()
+		blockChainJSON, err := json.Marshal(blockChain)
 		if err != nil {
-			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err})
+			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": err,
+			})
 		}
 
 		status := redisDB.Set(c.InfoRedis.CTX, ctx.Port(), blockChainJSON, 30*60*time.Second)

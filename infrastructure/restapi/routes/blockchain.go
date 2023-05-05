@@ -13,7 +13,7 @@ func BlockChainRoutes(router fiber.Router, controller *blockController.Controlle
 	// authentication
 	// routerPhoto.Use(middlewares.AuthJWTMiddleware())
 	{
-		routerBlockChain.Get("", controller.GetBlockChainByPort)
+		routerBlockChain.Get("", controller.GetAllBlockByPort)
 	}
 
 }

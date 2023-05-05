@@ -2,8 +2,6 @@ package user
 
 import (
 	"time"
-
-	_ "gorm.io/gorm"
 )
 
 // Auth contains the data of the authentication
