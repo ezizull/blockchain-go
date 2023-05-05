@@ -39,12 +39,13 @@ func (c *Controller) GetBlockChainByPort(ctx *fiber.Ctx) error {
 	redisData, redisErr := redisDB.Get(c.InfoRedis.CTX, ctx.Port()).Result()
 
 	if redisErr == redis.Nil {
+
 		port, err := strconv.ParseUint(ctx.Port(), 10, 64)
 		if err != nil {
 			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": mssgConst.StatusInvalidPort})
 		}
 
-		blockChain, err := c.BlockChain.GetByPort(port)
+		blockChain, err = c.BlockChain.GetByPort(port)
 		if err != nil {
 			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err})
 		}
